@@ -1,0 +1,43 @@
+{
+  "name": "photobooth-desktop",
+  "productName": "Photo Booth",
+  "version": "1.0.0",
+  "description": "Photo Booth สำหรับงานอีเวนต์ — ต่อกล้องดิจิตอล ใส่กรอบ พิมพ์ อัปโหลด Google Drive และ QR อัลบั้ม",
+  "main": "src/main.js",
+  "private": true,
+  "author": "Photo Booth",
+  "license": "UNLICENSED",
+  "scripts": {
+    "sync": "node scripts/sync-www.js",
+    "start": "node scripts/sync-www.js && electron .",
+    "kiosk": "node scripts/sync-www.js && electron . --kiosk",
+    "test": "node --test",
+    "dist": "node scripts/sync-www.js && electron-builder --publish never",
+    "dist:win": "node scripts/sync-www.js && electron-builder --win --x64 --publish never",
+    "dist:mac": "node scripts/sync-www.js && electron-builder --mac --x64 --arm64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.photobooth.desktop",
+    "productName": "Photo Booth",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["src/**/*", "www/**/*", "package.json"],
+    "win": {
+      "target": [{ "target": "msi", "arch": ["x64"] }, { "target": "nsis", "arch": ["x64"] }, { "target": "portable", "arch": ["x64"] }],
+      "icon": "build/icon.png"
+    },
+    "msi": { "oneClick": false, "perMachine": true, "createDesktopShortcut": true, "createStartMenuShortcut": true },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.photography",
+      "icon": "build/icon.png",
+      "identity": null,
+      "extendInfo": { "NSCameraUsageDescription": "ใช้กล้องเพื่อแสดงภาพสดและถ่ายรูปในบูธ" }
+    },
+    "linux": { "target": "AppImage", "category": "Graphics", "icon": "build/icon.png" }
+  }
+}
