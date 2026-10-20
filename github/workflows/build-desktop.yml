@@ -1,0 +1,50 @@
+name: Build Desktop
+
+# กด Actions → Build Desktop → Run workflow แล้วรอประมาณ 5–10 นาที
+# เสร็จแล้วดาวน์โหลดตัวติดตั้งได้จากหัวข้อ Artifacts ท้ายหน้าการรัน
+# (Windows = ไฟล์ .msi และ .exe · Mac = ไฟล์ .dmg ทั้งชิป Intel และ Apple Silicon)
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            script: dist:win
+            artifact: PhotoBooth-Windows
+            files: |
+              desktop/dist/*.msi
+              desktop/dist/*.exe
+          - os: macos-latest
+            script: dist:mac
+            artifact: PhotoBooth-Mac
+            files: |
+              desktop/dist/*.dmg
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build installer
+        run: npm run ${{ matrix.script }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
